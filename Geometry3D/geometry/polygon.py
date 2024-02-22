@@ -7,10 +7,14 @@ from .line import Line
 from .segment import Segment
 from .plane import Plane
 from ..utils.constant import *
+from..utils import get_main_logger
 from ..utils.vector import x_unit_vector,y_unit_vector
 
 import copy
 import math
+
+
+main_logger = get_main_logger()
 
 def get_circle_point_list(center,normal,radius,n=10):
     if n <= 2:
@@ -121,6 +125,7 @@ class ConvexPolygon(GeoBody):
         # merge same points
         points = copy.deepcopy(pts)
         self.points = sorted(set(points),key=points.index)
+
         if len(points) < 3:
             raise ValueError('Cannot build a polygon with number of points smaller than 3')
         if reverse:
@@ -207,7 +212,7 @@ class ConvexPolygon(GeoBody):
         v1 = the_normal.cross(v0)
         angle_point_dict = dict() # dict[angle] = Point
         for point in self.points:
-            if not point in self.plane:
+            if len(self.points) > 3 and not point in self.plane:
                 raise ValueError('Convex Check Fails Because {} Is Not On {}'.format(point,self.plane))
             pv = point.pv() - self.center_point.pv()
             y_coordinate = pv * v0
